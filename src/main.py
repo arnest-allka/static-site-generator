@@ -1,7 +1,9 @@
-from textnode import TextNode
+from leafnode import LeafNode
+
 
 def main():
-    text_node = TextNode('this is a text node', 'bold', 'https://www.boot.dev')
-    print(text_node)
+    leaf_node = LeafNode(tag="span", value="Example text", props={"class": "example-class"})
+    print(leaf_node)
+    print(leaf_node.to_html())
     
 main()
