@@ -36,7 +36,7 @@ class TestHTMLNode(unittest.TestCase):
         children = [HTMLNode(tag='p', value='child')]
         props = {'class': 'main'}
         node = HTMLNode(tag='div', value='parent', children=children, props=props)
-        expected_repr = "HTMLNode:\ntag: div\nvalue: parent\nchildren: parent\nprops: {'class': 'main'}\n"
+        expected_repr = "HTMLNode:\ntag: div\nvalue: parent\nchildren: [HTMLNode:\ntag: p\nvalue: child\n]\nprops: {'class': 'main'}\n"
         self.assertEqual(repr(node), expected_repr)
 
 if __name__ == '__main__':

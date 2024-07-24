@@ -22,7 +22,7 @@ class HTMLNode():
         if self.value:
             result += f"value: {self.value}\n"
         if self.children:
-            result += f"children: {self.value}\n"
+            result += f"children: {self.children}\n"
         if self.props:
             result += f"props: {self.props}\n"
         return result

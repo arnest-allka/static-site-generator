@@ -1,9 +1,17 @@
 from leafnode import LeafNode
+from parentnode import ParentNode
 
 
 def main():
-    leaf_node = LeafNode(tag="span", value="Example text", props={"class": "example-class"})
-    print(leaf_node)
-    print(leaf_node.to_html())
+    node = ParentNode(
+    "p",
+    [
+        LeafNode("b", "Bold text"),
+        LeafNode(None, "Normal text"),
+        LeafNode("i", "italic text"),
+        LeafNode(None, "Normal text"),
+    ],
+    )
+    print(node.to_html())
     
 main()
