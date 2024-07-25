@@ -17,3 +17,6 @@ class LeafNode(HTMLNode):
                 return f"<{self.tag}{' '+props if props else ''}>{self.value}</{self.tag}>"
             else:
                 return f"<{self.tag}{' '+props if props else ''}>{self.value}"
+            
+    def __repr__(self):
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"
