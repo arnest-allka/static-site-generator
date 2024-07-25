@@ -1,17 +1,13 @@
 from leafnode import LeafNode
 from parentnode import ParentNode
-
+from textnode import TextNode
 
 def main():
-    node = ParentNode(
-    "p",
-    [
-        LeafNode("b", "Bold text"),
-        LeafNode(None, "Normal text"),
-        LeafNode("i", "italic text"),
-        LeafNode(None, "Normal text"),
-    ],
-    )
-    print(node.to_html())
+    test_list = [1,2]
+    
+    if test_list:
+        print('True')
+    else:
+        print('False')
     
 main()
