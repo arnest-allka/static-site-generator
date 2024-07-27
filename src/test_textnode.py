@@ -2,6 +2,7 @@ import unittest
 
 from textnode import (
     TextNode,
+    split_nodes_delimiter,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -63,6 +64,74 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         self.assertEqual(html_node.tag, "b")
         self.assertEqual(html_node.value, "This is bold")
 
+class TestSplitNodesDelimiter(unittest.TestCase):
+
+    def test_split_code_delimiter(self):
+        node = TextNode("This is text with a `code block` word", "text")
+        expected_nodes = [
+            TextNode("This is text with a ", "text"),
+            TextNode("code block", "code"),
+            TextNode(" word", "text"),
+        ]
+        result_nodes = split_nodes_delimiter([node], "`", "code")
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_split_bold_delimiter(self):
+        node = TextNode("This is **bold** text", "text")
+        expected_nodes = [
+            TextNode("This is ", "text"),
+            TextNode("bold", "bold"),
+            TextNode(" text", "text"),
+        ]
+        result_nodes = split_nodes_delimiter([node], "**", "bold")
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_split_italic_delimiter(self):
+        node = TextNode("This is *italic* text", "text")
+        expected_nodes = [
+            TextNode("This is ", "text"),
+            TextNode("italic", "italic"),
+            TextNode(" text", "text"),
+        ]
+        result_nodes = split_nodes_delimiter([node], "*", "italic")
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_split_mismatched_delimiter(self):
+        node = TextNode("This is text with a `mismatched code block", "text")
+        with self.assertRaises(ValueError) as context:
+            split_nodes_delimiter([node], "`", "code")
+        self.assertEqual(str(context.exception), "Mismatched delimiter found in text node.")
+
+    def test_no_text_nodes(self):
+        node1 = TextNode("Not to split", "bold")
+        node2 = TextNode("Another node", "italic")
+        result_nodes = split_nodes_delimiter([node1, node2], "`", "code")
+        self.assertEqual(result_nodes, [node1, node2])
+
+    def test_empty_text_node(self):
+        node = TextNode("", "text")
+        expected_nodes = []
+        result_nodes = split_nodes_delimiter([node], "`", "code")
+        self.assertEqual(result_nodes, expected_nodes)
+
+    def test_multiple_delimiters(self):
+        node = TextNode("Mix `code` and **bold**", "text")
+        intermediate_nodes = split_nodes_delimiter([node], "`", "code")
+        expected_nodes = [
+            TextNode("Mix ", "text"),
+            TextNode("code", "code"),
+            TextNode(" and **bold**", "text"),
+        ]
+        self.assertEqual(intermediate_nodes, expected_nodes)
+        
+        final_nodes = split_nodes_delimiter(intermediate_nodes, "**", "bold")
+        final_expected_nodes = [
+            TextNode("Mix ", "text"),
+            TextNode("code", "code"),
+            TextNode(" and ", "text"),
+            TextNode("bold", "bold"),
+        ]
+        self.assertEqual(final_nodes, final_expected_nodes)
 
 if __name__ == "__main__":
     unittest.main()

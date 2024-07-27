@@ -1,3 +1,4 @@
+from unittest import result
 from leafnode import LeafNode
 
 text_type_text = "text"
@@ -37,3 +38,24 @@ def text_node_to_html_node(text_node):
     if text_node.text_type == text_type_image:
         return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text})
     raise ValueError(f"Invalid text type: {text_node.text_type}")
+
+def split_nodes_delimiter(old_types, delimiter, text_type):
+    new_nodes = []
+
+    for node in old_types:
+        if node.text_type != text_type_text:
+            new_nodes.append(node)
+            continue
+                
+        splited_lines = node.text.split(delimiter)
+
+        if len(splited_lines) % 2 == 0:
+            raise ValueError("Mismatched delimiter found in text node.")
+        
+        for i, line in enumerate(splited_lines):
+            if i % 2 == 0:
+                if line: 
+                    new_nodes.append(TextNode(line, text_type_text))
+            else:
+                new_nodes.append(TextNode(line, text_type))
+    return new_nodes
