@@ -2,6 +2,8 @@ import unittest
 
 from textnode import (
     TextNode,
+    extract_markdown_images,
+    extract_markdown_links,
     split_nodes_delimiter,
     text_type_text,
     text_type_bold,
@@ -132,6 +134,66 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode("bold", "bold"),
         ]
         self.assertEqual(final_nodes, final_expected_nodes)
+
+class TestMarkdownExtraction(unittest.TestCase):
+
+    def test_extract_markdown_images_basic(self):
+        text = "Here is an image ![alt text](http://example.com/image.jpg)"
+        expected = [("alt text", "http://example.com/image.jpg")]
+        self.assertEqual(extract_markdown_images(text), expected)
+
+    def test_extract_markdown_images_multiple(self):
+        text = ("Here is an image ![alt text](http://example.com/image.jpg) "
+                "and another ![another image](http://example.com/another.jpg)")
+        expected = [
+            ("alt text", "http://example.com/image.jpg"),
+            ("another image", "http://example.com/another.jpg")
+        ]
+        self.assertEqual(extract_markdown_images(text), expected)
+
+    def test_extract_markdown_images_none(self):
+        text = "This text has no images."
+        expected = []
+        self.assertEqual(extract_markdown_images(text), expected)
+
+    def test_extract_markdown_images_edge_cases(self):
+        text = ("![empty alt]() ![](http://example.com/image.jpg) "
+                "![alt with spaces](http://example.com/with spaces.jpg)")
+        expected = [
+            ("empty alt", ""),
+            ("", "http://example.com/image.jpg"),
+            ("alt with spaces", "http://example.com/with spaces.jpg")
+        ]
+        self.assertEqual(extract_markdown_images(text), expected)
+
+    def test_extract_markdown_links_basic(self):
+        text = "Here is a link [link text](http://example.com)"
+        expected = [("link text", "http://example.com")]
+        self.assertEqual(extract_markdown_links(text), expected)
+
+    def test_extract_markdown_links_multiple(self):
+        text = ("Here is a link [link text](http://example.com) "
+                "and another [another link](http://example.com/another)")
+        expected = [
+            ("link text", "http://example.com"),
+            ("another link", "http://example.com/another")
+        ]
+        self.assertEqual(extract_markdown_links(text), expected)
+
+    def test_extract_markdown_links_none(self):
+        text = "This text has no links."
+        expected = []
+        self.assertEqual(extract_markdown_links(text), expected)
+
+    def test_extract_markdown_links_edge_cases(self):
+        text = ("[empty text]() [](http://example.com) "
+                "[link with spaces](http://example.com/with spaces)")
+        expected = [
+            ("empty text", ""),
+            ("", "http://example.com"),
+            ("link with spaces", "http://example.com/with spaces")
+        ]
+        self.assertEqual(extract_markdown_links(text), expected)
 
 if __name__ == "__main__":
     unittest.main()
