@@ -5,6 +5,8 @@ from textnode import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_delimiter,
+    split_nodes_image,
+    split_nodes_link,
     text_type_text,
     text_type_bold,
     text_type_italic,
@@ -194,6 +196,82 @@ class TestMarkdownExtraction(unittest.TestCase):
             ("link with spaces", "http://example.com/with spaces")
         ]
         self.assertEqual(extract_markdown_links(text), expected)
+
+class TestSplitNodes(unittest.TestCase):
+
+    def test_split_nodes_image_basic(self):
+        node = TextNode("Here is an image ![alt text](http://example.com/image.jpg)", "text")
+        new_nodes = split_nodes_image([node])
+        expected = [
+            TextNode("Here is an image ", "text"),
+            TextNode("alt text", "image", "http://example.com/image.jpg")
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_image_multiple(self):
+        node = TextNode("![first](http://example.com/first.jpg) and ![second](http://example.com/second.jpg)", "text")
+        new_nodes = split_nodes_image([node])
+        expected = [
+            TextNode("first", "image", "http://example.com/first.jpg"),
+            TextNode(" and ", "text"),
+            TextNode("second", "image", "http://example.com/second.jpg")
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_image_none(self):
+        node = TextNode("This text has no images.", "text")
+        new_nodes = split_nodes_image([node])
+        expected = [node]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_image_edge_cases(self):
+        node = TextNode("![empty alt]() ![](http://example.com/image.jpg) ![alt with spaces](http://example.com/with spaces.jpg)", "text")
+        new_nodes = split_nodes_image([node])
+        expected = [
+            TextNode("empty alt", "image", ""),
+            TextNode(" ", "text"),
+            TextNode("", "image", "http://example.com/image.jpg"),
+            TextNode(" ", "text"),
+            TextNode("alt with spaces", "image", "http://example.com/with spaces.jpg")
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_link_basic(self):
+        node = TextNode("Here is a link [link text](http://example.com)", "text")
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("Here is a link ", "text"),
+            TextNode("link text", "link", "http://example.com")
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_link_multiple(self):
+        node = TextNode("[first link](http://example.com/first) and [second link](http://example.com/second)", "text")
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("first link", "link", "http://example.com/first"),
+            TextNode(" and ", "text"),
+            TextNode("second link", "link", "http://example.com/second")
+        ]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_link_none(self):
+        node = TextNode("This text has no links.", "text")
+        new_nodes = split_nodes_link([node])
+        expected = [node]
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_nodes_link_edge_cases(self):
+        node = TextNode("[empty link]() [](http://example.com) [link with spaces](http://example.com/with spaces)", "text")
+        new_nodes = split_nodes_link([node])
+        expected = [
+            TextNode("empty link", "link", ""),
+            TextNode(" ", "text"),
+            TextNode("", "link", "http://example.com"),
+            TextNode(" ", "text"),
+            TextNode("link with spaces", "link", "http://example.com/with spaces")
+        ]
+        self.assertEqual(new_nodes, expected)
 
 if __name__ == "__main__":
     unittest.main()
