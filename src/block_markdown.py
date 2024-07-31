@@ -133,12 +133,3 @@ def quote_to_html_node(block):
     print(content)
     children = text_to_children(content)
     return ParentNode("blockquote", children)
-    
-
-markdown_string = """
-> this is a quote
-> this is a quote
-> this is a quote
-> this is a quote
-"""
-print(markdown_to_html_node(markdown_string))

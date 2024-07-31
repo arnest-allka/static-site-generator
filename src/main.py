@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 def copy_directory(src, dst):
@@ -16,6 +17,14 @@ def copy_directory(src, dst):
             shutil.copy(src_path, dst_path)
             print(f"Copied file: {src_path}")
 
+def extract_title(markdown):
+    match  = re.search(r'^#\s+(.*)', markdown, re.MULTILINE)
+
+    if match:
+        return match.group(1).strip()
+    else:
+        raise Exception("No h1 header found")
+
 def main():
     source_dir = 'static'
     public_dir = 'public'
@@ -25,4 +34,3 @@ def main():
             
 if __name__ == '__main__':
     main()
-    
